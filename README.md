@@ -1,2 +1,0 @@
-# Proyectacopaco
-Proyecto unificado
