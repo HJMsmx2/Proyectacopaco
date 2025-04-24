@@ -1,0 +1,25 @@
+USUARIOS NORMALES 
+- name: Prueba usuarios 
+  hosts: prueba 
+  user: root 
+  tasks: 
+    - name: Crear un usuario tecno
+      user:
+        name: tecno1
+        state: present
+        comment: "Usuario tecno"
+        shell: /bin/bash
+        create_home: yes
+        password: "usuario"
+    - name: Crear grupo departamento
+      group:
+        name: departamento
+        state: present
+    - name: Añadir tecno a departamento
+      user:
+        name: tecno1
+        groups: departamento
+        append: yes
+
+
+

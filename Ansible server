@@ -1,0 +1,216 @@
+- name: Preparar el server 
+  hosts: server
+  user: root 
+  tasks:
+   - name: Configuracion netplan 
+     src: netplan 
+     dest: "/etc/netplan/50-cloud-init.yaml"
+   - name: Aplicar la configuracion 
+     command: netplan apply 
+   - name: Instalacion kea 
+     ansible.built.apt:
+       name: kea-dhcp4-server
+       state: present
+       update_cache: yes
+   - name: configuracion del kea 
+     ansible.built.copy:
+       src: kea 
+       dest: /etc/kea/kea-dhcp4.conf 
+   - name: Reiniciar Kea 
+     ansible.built.systemd:
+       name: kea-dhcp4-server
+       state: restarted 
+   - name: Instalar bind9 
+     apt: 
+       name: bind9 
+       state: present 
+   - name: Instalar herramientas adicionales bind9
+     apt: 
+       name:
+         - bind9utils
+         - dnsutils
+       state: present 
+   - name: Crear directorio /etc/bind 
+     file: 
+       path: /etc/bind/dns
+       state: directory 
+       owner: root 
+       group: root
+       mode: '0775'
+   - name: Copiar named.conf.options 
+     copy:
+       src: namedcon 
+       dest: /etc/bind/dns/named.conf.options
+       owner: root
+       group: root
+       mode: '0664'
+   - name: Copiar db.server.local
+     copy: 
+       src: localdb 
+       dest: /etc/bind/dns/db.server.local
+       owner: root
+       group: root
+       mode: '0644'
+   - name: Configuracion db.1.168.192
+     copy:
+       src: dbip
+       dest: /etc/bind/dns/db.1.168.192
+       owner: root
+       group: root
+       mode: '0644'
+   - name: Configuracion named.conf.local (default)
+     copy: 
+       src:  confnamed
+       dest: /etc/default/named.conf.local 
+       owner: root
+       group: root
+       mode: '0644'
+   - name: Configuracion named.conf.local (bind)
+     copy: 
+       src: namedlocal
+       dest: /etc/bind/named.conf.local
+       owner: root
+       group: root
+       mode: '0644'
+   - name: Reiniciar bind9 
+     service: 
+       name: bind9 
+       state: restarted 
+   - name: Instalar Samba 
+     apt: 
+       name:
+         - samba
+         - smbclient
+       state: present 
+     update_cache: yes 
+   - name: Crear clientehjm (usuario)
+     user:
+       name: clientehjm 
+       state: present
+       comment: "clientehjm"
+       shell: /bin/bash 
+       create_home: yes
+       password: "usuario"
+   - name: Crear cliente1hjm (usuario)
+     user: 
+       name: cliente1hjm 
+       state: present
+       comment: "cliente1hjm"
+       shell: /bin/bash 
+       create_home: yes 
+       password: "usuario"
+   - name: Crear informatica (grupo)
+     group:
+       name: informatica
+       state: present
+   - name: Crear ventas (grupo)
+     group:
+      name: ventas
+      state: present 
+   - name: Añadir clientehjm en ventas 
+     user: 
+       name: clientehjm 
+       groups: ventas
+       append: yes
+   - name: Añadir cliente1hjm en informatica
+     user:  
+       name: cliente1hjm
+       groups: informatica
+       append: yes
+   - name: Crear directorio /srv/cliente_manual 
+     file: 
+       path: /srv/cliente_manual
+       state: directory
+       owner: clientehjm
+       group: clientehjm 
+       mode: '0775'
+   - name: Crear directorio /srv/ventas
+     file: 
+       path: /srv/ventas
+       state: directory 
+       owner: root
+       group: root
+       mode: '0775'
+   - name: Crear directorio /srv/cliente1_manual 
+     file: 
+       path: /srv/cliente1_manual 
+       state: directory 
+       owner: cliente1hjm 
+       group: cliente1hjm 
+       mode: '0775'
+   - name: Cambiar propietario y grupo de /srv/ventas 
+     file: 
+       path: /srv/ventas
+       owner: root
+       group: ventas 
+       mode: '0775'
+   - name: Cambiar propietario y grupo de /srv/informatica
+     file: 
+      path: /srv/informatica
+      owner: root
+      group: informarica
+      mode: '0775'
+   - name: Configuracion archivo smb.conf 
+     template: 
+       src: smbconf 
+       dest: /etc/samba/smb.conf
+       owner: root
+       group: root
+       mode: '0644'
+   - name: Reiniciar samba 
+     systemd: 
+       name: smbd
+       state: restarted 
+   - name: Instalacion sshpass
+     apt:
+       name: sshpass
+       state: present
+       update_cache: yes
+   - name: Instalar repositorio Ansible 
+     apt_repository:
+       repo: 'ppa:ansible/ansible'
+       state: present 
+       update_cache: yes
+   - name: Instalar Ansible 
+     apt: 
+       name: ansible
+       state: present 
+   - name: Instalar squid 
+     apt:
+       name: squid
+       state: present 
+   - name: crontab
+     apt:
+       name: cron 
+       state: present 
+   - name: Instalar Docker
+     apt:
+       name: docker.io
+       state: present
+   - name: Instalar y habilitar docker
+     service: 
+       name: docker
+       state: started
+       enabled: yes
+   - name: Descargar docker compose
+     shell: >
+       curl -L https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/release/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+     args:
+       creates: /usr/local/bin/docker-compose
+   - name: Dar permisos de ejecución a docker-compose 
+     file:
+       path: /usr/local/bin/docker-compose
+       mode: 'u+x'
+   - name: Instalar rsync 
+     apt:
+       name: rsync 
+       state: present 
+   - name: Instalar Apache2
+     apt:
+       name: apache2
+       state: present 
+   - name: Iniciar y habilitar apache
+     service: 
+       name: apache2
+       state: started 
+       enabled: yes 

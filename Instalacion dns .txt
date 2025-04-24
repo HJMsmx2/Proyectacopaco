@@ -1,0 +1,58 @@
+Instalacion, Configuracion y restablecer BIND9 en ansible. 
+
+    - name: Instalar BIND9
+      apt:
+        name: bind9
+        state: present
+    - name: Instalar herramientas adicionales de BIND9
+      apt:
+        name:
+          - bind9utils
+          - dnsutils
+        state: present
+    - name: Crear el directorio en /etc/bind
+      file:
+        path: /etc/bind/dns 
+        state: directory  
+        owner: root  
+        group: root  
+        mode: '0755'  
+    - name: Copiar archivo de configuración named.conf.options 
+      copy:
+        src:  namedcon
+        dest: /etc/bind/dns/named.conf.options  
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Copiar archivo de db.local
+      copy:
+        src: localdb  
+        dest: /etc/bind/dns/db.server.local  
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Configuracion db.ip 
+      copy: 
+        src: dbip
+        dest: /etc/bind/dns/db.1.168.192 
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Configuracion named
+      copy: 
+        src: confnamed 
+        dest: /etc/default/named.conf.local 
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Configuracion zonas  
+      copy: 
+        src: namedlocal
+        dest: /etc/bind/named.conf.local 
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Reiniciar servicio bind9
+      service:
+        name: bind9
+        state: restarted

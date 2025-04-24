@@ -1,0 +1,20 @@
+PARTE DEL HOST DONDE ME DICE DONDE LANZAR EL ANSIBLE 
+
+[prueba]
+prueba1 ansible_host=root@ip 
+
+PARTE DEL HOST DONDE DECLARO LOS CLIENTES DE SAMBA 
+[samba_vars]
+samba_users:
+  - username: clientehjm 
+    password: clientehjm 
+    groups:
+      - ventas
+  - username: cliente1hjm
+    password: cliente1hjm 
+    groups:
+      - informatica
+
+samba_groups:
+  - ventas 
+  - informatica 

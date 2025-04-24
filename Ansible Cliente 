@@ -1,0 +1,27 @@
+- name: Preparar clientes 
+  hosts: clientes
+  user: root 
+  tasks:
+   - name: Configuracion netplan 
+     src: netplan 
+     dest: "/etc/netplan/50-cloud-init.yaml"
+   - name: Aplicar la configuracion 
+     command: netplan apply 
+   - name: Instalacion sshpass
+     apt:
+       name: sshpass
+       state: present
+       update_cache: yes
+   - name: Instalar rsync 
+     apt:
+       name: rsync 
+       state: present 
+   - name: Instalar Apache2
+     apt:
+       name: apache2
+       state: present 
+   - name: Iniciar y habilitar apache
+     service: 
+       name: apache2
+       state: started 
+       enabled: yes 

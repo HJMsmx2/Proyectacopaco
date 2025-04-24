@@ -1,0 +1,40 @@
+[Maquina ansible]
+sudo apt update 
+sudo apt install software-properties-common 
+sudo add-apt-repository ppa:ansible/ansible 
+sudo apt install ansible 
+ssh-keygen
+ssh-copy-id root@ip 
+nano netplan 
+nano playbook.yml
+nano hosts 
+ansible-playbook -i hosts playbook.yml 
+cp playbook.yml playbook1.yml 
+nano playbook2.yml 
+nano kea 
+ansible-playbook -i hosts playbook1.yml 
+cp playbook.yml playbook2.yml 
+nano playbook2.yml 
+nano namedconf
+nano localdb 
+nano dbip 
+nano confnamed
+nano namedlocal
+ansible-playbook -i hosts playbook2.yml 
+cp playbook.yml playbook3.yml 
+nano playbook3.yml 
+ansible-playbook -i hosts playbook3.yml 
+cp playbook.yml playbook4.yml
+nano playbook3.yml 
+nano smbconf 
+
+
+
+[Maquina que recibe el ansible]
+sudo passwd root 
+sudo nano /etc/ssh/sshd_config (permitir el root) 
+sudo systemctl restart ssh 
+sudo systemctl status ssh 
+sudo systemctl status kea 
+sudo systemctl status bind9 
+sudo systemctl status smbd 

@@ -1,0 +1,34 @@
+-  name: configuracíon squid
+   ansible.built.copy: 
+     src: squid (fichero donde estara la configuracíon) 
+     dest: /etc/squid/squid.conf 
+     content: |
+
+     http_port 8080
+     accl SSL_ports port 443  
+     acl Safe_ports port 80          # http 
+     acl Safe_ports port 21          # ftp 
+     acl Safe_ports port 443         # https
+     acl Safe_ports port 70          # gopher
+     acl Safe_ports port 210         # wais
+     acl Safe_ports port 1025-65535  # unregistered ports 
+     acl Safe_ports port 280         # http_mgmt
+     acl Safe_ports port 488         # gss-http 
+     acl Safe_ports port 591         # filemaker 
+     acl Safe_ports port 777         # multiling http 
+
+     http_access deny !Safe_ports 
+     http_access allow permesos 
+     http_access deny CONNECT !SSL_ports 
+     http_access deny manager 
+
+     # And finally deny all other access to this proxy 
+     http_access deny all 
+
+   notify: Reiniciar squid
+ 
+handlers: 
+  - name: Reiniciar squid 
+    ansible.builtin.systemd:
+      name: squid 
+      state: restarted 

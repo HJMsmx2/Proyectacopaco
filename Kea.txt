@@ -1,0 +1,83 @@
+Instalacion, Configuracion, restablecer Kea en ansible y activacion de la ip forwarding. 
+
+    - name: Instal·lar el servidor DHCP KEA
+      ansible.builtin.apt:
+        name: kea-dhcp4-server
+        state: present
+        update_cache: yes
+
+    - name: Configurar el servidor DHCP KEA
+      ansible.builtin.copy:
+        src: kea 
+        dest: /etc/kea/kea-dhcp4.conf
+        content: |
+    {
+            "Dhcp4": {
+              "interfaces-config": {
+                "interfaces": [ "interfaces" ]
+              },
+              "subnet4": [
+                {
+                  "subnet": "x.x.x.x/x",
+                  "pools": [
+                    { "pool": "x.x.x.x - x.x.x.x" }
+                  ],
+                  "option-data": [
+                    { "name": "routers", "data": "x.x.x.x" },
+                    { "name": "domain-name-servers", "data": "x.x.x.x" }
+                 ]
+               }
+              ]
+             }
+     }
+
+  - name: Activar IP forwarding temporalmente
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        state: present
+        sysctl_set: yes
+        reload: yes
+
+    - name: Asegurar IP forwarding persistente
+      lineinfile:
+        path: /etc/sysctl.conf
+        line: 'net.ipv4.ip_forward = 1'
+        state: present
+
+    - name: Aplicar configuración sysctl
+      command: sysctl -p
+
+    - name: Habilitar NAT en enp1s0
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        out_interface: enp1s0
+        jump: MASQUERADE
+
+    - name: Permitir reenvío de enp2s0 a enp1s0
+      iptables:
+        chain: FORWARD
+        in_interface: enp2s0
+        out_interface: enp1s0
+        jump: ACCEPT
+
+    - name: Permitir tráfico establecido de enp1s0 a enp2s0
+      command: >
+        iptables -A FORWARD -i enp1s0 -o enp2s0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+    - name: Instalar iptables-persistent
+      apt:
+        name: iptables-persistent
+        state: present
+        update_cache: yes
+
+    - name: Guardar reglas de iptables
+      command: netfilter-persistent save
+
+  handlers:
+    - name: Reiniciar KEA
+      ansible.builtin.systemd:
+        name: kea-dhcp4-server
+        state: restarted
+

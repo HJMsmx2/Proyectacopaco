@@ -1,0 +1,35 @@
+    - name: Crear una red Docker de tipo bridge
+      docker_network:
+        name: mi_red_customizada
+        state: present
+        driver: bridge  # Puedes elegir otros controladores como 'overlay' si usas Docker Swarm
+
+    - name: Verificar que la red Docker fue creada
+      command: docker network ls
+      register: docker_network_list
+
+    - name: Mostrar redes Docker
+      debug:
+        msg: "{{ docker_network_list.stdout }}"
+
+
+Como crear una red docker desde la linea de comandos: 
+    
+    · Con este comando se crea la subnet de docker: 
+        - docker network create --subnet=192.168.1.0/24
+        - docker network create --driver bridge mi_red_bridge
+    
+    · Si quieres ponerle tambien gateway tenemos este comando más avanzado:
+        - docker network create --driver bridge --subnet 192.168.100.0/24 --gateway 192.168.100.1 mi_red_bridge_avanzada
+
+    · Ver si se han creado las redes: 
+        - docker network ls 
+
+    · Conectar contenedor a la red que hemos creado: 
+        - docker run -d --name mi_contenedor --network mi_red_bridge nginx 
+
+    · Ver la red de un contenedor: 
+        - docker inspect mi_contenedor 
+
+
+    
