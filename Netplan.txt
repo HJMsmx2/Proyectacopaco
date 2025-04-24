@@ -11,10 +11,7 @@
               enp2s0:
                 dhcp4: false
                 addresses:
-                  - x.x.x.x/x
-                nameservers:
-                  addresses:
-                    - 192.168.236.1
+                  - 192.168.1.2/24
 
     - name: Aplicar configuración de red
       command: netplan apply
