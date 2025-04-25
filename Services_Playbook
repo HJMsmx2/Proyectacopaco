@@ -1,0 +1,35 @@
+- name: Instalaciones 
+  hosts: prueba
+  user: root
+  tasks:
+    - name: Instalar sshpass
+      apt:
+        name: sshpass
+        state: present
+        update_cache: yes
+
+   - name: Instalar el repositorio de Ansible (si no está agregado)
+     apt_repository:
+       repo: 'ppa:ansible/ansible'
+       state: present
+       update_cache: yes
+
+   - name: Instalar Ansible
+     apt:
+       name: ansible
+       state: present
+
+   - name: Instalar Squid
+     apt:
+       name: squid
+       state: present
+
+   - name: Instalar el paquete cron
+     apt:
+       name: cron
+       state: present
+
+   - name: Instalar rsync
+     apt:
+       name: rsync
+       state: present
