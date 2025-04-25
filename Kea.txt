@@ -24,7 +24,7 @@ Instalacion, Configuracion, restablecer Kea en ansible y activacion de la ip for
                   ],
                   "option-data": [
                     { "name": "routers", "data": "192.168.1.2" },
-                    { "name": "domain-name-servers", "data": "8.8.8.8" }
+                    { "name": "domain-name-servers", "data": "192.168.1.2, 9.9.9.9" }
                  ]
                }
               ]
