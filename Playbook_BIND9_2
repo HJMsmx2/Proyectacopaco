@@ -1,0 +1,92 @@
+FICHEROS DEL ANSIBLE PARA DNS (BIND9)
+- name: Prueba kea
+  hosts: prueba
+  user: root
+  tasks:
+    - named.conf.options: 
+      acl internal-network {
+     192.168.1.0/24 
+      };
+      options {
+              directory "/var/cache/bind";
+              allow-query { localhost; internal-network; };
+              allow-transfer { localhost; };
+              forwarders { 192.168.236.1; };
+              recursion yes;
+              dnssec-validation auto; 
+              listen-on-v6 { any; };
+      };
+    
+    - db.server.local: 
+          $TTL 604800
+          @ IN SOA primary.server.local. root.primary.server.local. (
+                                                2022072651 ; Serial 
+                                                3600 ; Refresh 
+                                                1800 ; Retry 
+                                                604800 ) ; Negative Cache TTL 
+          ;Name Server Information 
+          @    IN  NS   primary.server.local.
+    
+          ;IP address of Your domain Name Server (DNS) 
+          primary IN A  192.168.1.2  
+          server IN A  192.168.1.2   
+          
+          ;Mail Server MX (Mail exchanger) Record 
+          server.local IN MX 10 mail.server.local.
+     
+          ;A Record for Host names 
+          www IN A 192.168.1.2
+          mail IN A 192.168.1.2 
+    
+          ;CNAME Record 
+          pop3 IN CNAME server
+          smtp IN CNAME server 
+    
+    - db.ip de la red al reves (1.162.192):
+    $TTL 604800
+          @ IN SOA server.local. root.server.local. (
+                                                2022072752 ; Serial 
+                                                3600 ; Refresh 
+                                                1800 ; Retry 
+                                                604800  ; Expire
+                                                86400 ; Minimum TTL 
+          )
+    
+          ;Your Name Server Info
+          @    IN  NS   primary.server.local.
+          primary IN A  192.168.1.2 
+          server IN A  192.168.1.2 
+          
+          ;Reverse Lookup for Your DNS Server 
+          (bit del host) IN PTR  primary.server.local.
+     
+          ;PTR Record IP address to HostName
+          (bit del host) IN PTR  www.server.local.
+          (bit del host) IN PTR  mail.server.local.
+    
+    - (default) named.conf.local: 
+            #
+            # run resolvo conf
+            RESOLVCONF=no 
+    
+            # startup options for the server 
+            OPTIONS="-u bind -4"
+    
+    - (bind) named.conf.local: 
+    //
+    // Do any local configuration here 
+    //
+    
+    // Consider adding the 1918 zones here, if they are not used in your 
+    // organization
+    // include "/etc/bind/zones.rfc1918";
+    
+    zone "(nombre).local" IN {
+              type master;
+              file "/etc/bind/dns/db.server.local";
+    };
+    zone "1.168.192.in-addr.arpa"{
+              type master; 
+              file "/etc/bind/dns/db.1.168.192";
+    };
+    
