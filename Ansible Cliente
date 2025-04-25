@@ -1,8 +1,33 @@
-- name: Instalaciones
-  hosts: cliente
-  user: root
+- name: Preparar clientes 
+  hosts: server
+  user: root 
   tasks:
-    - name: Actualizar la lista de paquetes
+    - name: Crear un directorio
+      file:
+        path: /home/usuario/ansible_cliente 
+        state: directory
+        mode: '0755'  
+
+    -name: copiar archivo con ansible.
+     copy:
+       src: playbook.yml  
+       dest: /home/usuario/ansible_cliente/playbook.yml  
+       mode: '0644'
+   - name: copiar archivo hosts
+     copy: 
+       src: hostsc
+       dest: /home/usuario/ansible_cliente/hosts
+  - name: ejecutar comando ansible 
+    command: ansible-playbook -i anisible_cliente/hosts ansible_cliente/playbook.yml
+  
+
+-------------------------------------------
+Contenido archivo: 
+-name: Instalaciones 
+ hosts: clientes
+ user: root
+ tasks: 
+    -name:Actualizar la lista de paquetes
       apt:
         update_cache: yes
 
@@ -10,10 +35,6 @@
       apt:
         name: libreoffice
         state: present
+--------------------------------------------
 
-    - name: Crear carpeta
-      file:
-        path: /home/usuario/Descargas/usuario
-        state: directory
-        mode: '0755'
 
