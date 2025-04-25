@@ -1,5 +1,9 @@
 Instalacion, Configuracion y restablecer BIND9 en ansible. 
 
+- name: Prueba kea
+  hosts: prueba
+  user: root
+  tasks:
     - name: Instalar BIND9
       apt:
         name: bind9
