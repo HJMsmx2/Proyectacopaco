@@ -57,6 +57,7 @@ network:
                 via: 192.168.236.1
             nameservers:
               addresses: [192.168.236.1]
+      
     version: 2
 EONET
 
