@@ -1,0 +1,112 @@
+---
+- name: Prueba samba
+  hosts: prueba
+  user: root
+  tasks:
+
+    - name: Instalar el paquete de samba
+      apt:
+        name:
+          - samba
+          - smbclient
+        state: present
+      update_cache: yes
+
+    - name: Crear un usuario clientehjm
+      user:
+        name: clientehjm
+        state: present
+        comment: "Usuario clientehjm"
+        shell: /bin/bash
+        create_home: yes
+        password: "clientehjm"
+
+    - name: Crear un usuario cliente1hjm
+      user:
+        name: cliente1hjm
+        state: present
+        comment: "Usuario cliente1hjm"
+        shell: /bin/bash
+        create_home: yes
+        password: "cliente1hjm"
+
+    - name: Crear grupo informatica
+      group:
+        name: informatica
+        state: present
+
+    - name: Crear grupo ventas
+      group:
+        name: ventas
+        state: present
+
+    - name: Añadir clientehjm a ventas
+      user:
+        name: clientehjm
+        groups: ventas
+        append: yes
+
+    - name: Añadir cliente1hjm a informatica
+      user:
+        name: cliente1hjm
+        groups: informatica
+        append: yes
+
+    - name: Crear directorio /srv/cliente_manual
+      file:
+        path: /srv/cliente_manual
+        state: directory
+        owner: clientehjm
+        group: clientehjm
+        mode: '0775'
+
+    - name: Crear directorio /srv/ventas
+      file:
+        path: /srv/ventas
+        state: directory
+        owner: root
+        group: ventas
+        mode: '0775'
+
+    - name: Crear directorio /srv/informatica
+      file:
+        path: /srv/informatica
+        state: directory
+        owner: root
+        group: informatica
+        mode: '0775'
+
+    - name: Crear directorio /srv/cliente1_manual
+      file:
+        path: /srv/cliente1_manual
+        state: directory
+        owner: cliente1hjm
+        group: cliente1hjm
+        mode: '0775'
+
+    - name: Cambiar propietario y grupo del directorio /srv/ventas
+      file:
+        path: /srv/ventas
+        owner: root
+        group: ventas
+        mode: '0775'
+
+    - name: Cambiar propietario y grupo del directorio /srv/informatica
+      file:
+        path: /srv/informatica
+        owner: root
+        group: informatica
+        mode: '0775'
+
+    - name: Configurar el archivo smb.conf con la configuracion básica
+      template:
+        src: smbconf
+        dest: /etc/samba/smb.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reiniciar samba
+      systemd:
+        name: smbd
+        state: restarted
