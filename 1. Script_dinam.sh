@@ -6,7 +6,7 @@ USERsv1="usuario"
 PASSsv1="usuario"
 PASSsv2="melon"
 HOST_IP0=$1         # IP actual de la Server
-HOST_IP=$2          # IP estática que se aplicará
+HOST_IP=192.168.1.2          # IP estática que se aplicará
 
 # ------------------------------------------------------------------
 # Parte local
