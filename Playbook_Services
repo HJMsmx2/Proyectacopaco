@@ -33,3 +33,8 @@
      apt:
        name: rsync
        state: present
+   
+   - name: Instalar Cockpit
+     apt:
+       name: cockpit
+       state: present
