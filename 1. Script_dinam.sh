@@ -19,6 +19,9 @@ echo "$PASSsv1" | sudo -S apt update
 echo "[+] Instalando sshpass en la máquina local..."
 echo "$PASSsv1" | sudo -S apt install sshpass -y
 
+echo "[+] Instalando ansible en la máquina local..."
+echo "$PASSsv1" | sudo -S apt install ansible -y
+
 # ------------------------------------------------------------------
 # Parte remota (Server)
 # ------------------------------------------------------------------
@@ -51,7 +54,11 @@ network:
         enp1s0:
             dhcp4: false
             addresses:
-              - $HOST_IP/22
+              - $HOST_IP0/22
+        enp2s0:
+            dhcp4: false
+            addresses:
+              - $HOST_IP/24    
             routes:
               - to: default
                 via: 192.168.236.1
@@ -74,14 +81,19 @@ echo "[✔] Script ejecutado correctamente. La máquina Server ya está configur
 # ------------------------------------------------------------------
 # Comprobación de la conectividad y conexión al root del servidor.
 # ------------------------------------------------------------------
+echo "Creando clave publica"
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+sshpass -p "$PASSsv2" ssh-copy-id root@"$HOST_IP0"
+
+
     
 echo "[...] Esperando a que la máquina Server esté disponible en su nueva IP..."
 
 for i in {1..10}; do
-    ping -c 1 "$HOST_IP" > /dev/null 2>&1 && break
+    ping -c 1 "$HOST_IP0" > /dev/null 2>&1 && break
     echo "Esperando... ($i)"
     sleep 3
 done
 
 echo "[+] Comprobando conexión SSH como root..."
-sshpass -p "$PASSsv2" ssh -o StrictHostKeyChecking=no root@"$HOST_IP"
+ssh root@"$HOST_IP0"
