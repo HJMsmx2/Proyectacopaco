@@ -5,7 +5,7 @@
 USERsv1="usuario"
 PASSsv1="usuario"
 PASSsv2="melon"
-HOST_IP0=$1         # IP actual de la Server
+HOST_IP0=192.168.237.2         # IP actual de la Server
 HOST_IP=192.168.1.2          # IP estática que se aplicará
 
 # ------------------------------------------------------------------
@@ -91,7 +91,7 @@ echo "[...] Esperando a que la máquina Server esté disponible en su nueva IP..
 
 for i in {1..10}; do
     ping -c 1 "$HOST_IP0" > /dev/null 2>&1 && break
-    echo "Esperando... ($i)"
+    echo "Esperando... ($HOST_IP0)"
     sleep 3
 done
 
