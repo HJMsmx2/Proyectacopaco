@@ -100,18 +100,6 @@ echo "$PASSsv1" | sudo -S bash -c '
 
     echo "[+] Reescribiendo Netplan..."
     cat > /etc/netplan/50-cloud-init.yaml << EONET
-network:
-    ethernets:
-        enp1s0:
-            dhcp4: false
-            addresses:
-              - $HOST_IP0/22
-        enp2s0:
-            dhcp4: false
-            addresses:
-              - $HOST_IP/24    
-            routes:
-              - to: default
 
 network:
     ethernets:
